@@ -1,13 +1,23 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shader-testing</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="canvas-container"></div>
+    <div class="ui-container">
+      <div class="subtitle">IT'S NOT A CAR, IT'S A...</div>
+      <div class="title">Experience</div>
+      <div class="modes-container">
+        <button class="mode-btn active" data-mode="workspace">Workspace</button>
+        <button class="mode-btn" data-mode="chill">Chill Space</button>
+        <button class="mode-btn" data-mode="photo">Photo Booth</button>
+        <button class="mode-btn" data-mode="date">Date Night</button>
+        <button class="mode-btn" data-mode="nightclub">Nightclub</button>
+      </div>
+    </div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
