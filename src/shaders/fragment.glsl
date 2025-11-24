@@ -4,6 +4,9 @@ out vec4 finalColor;
 uniform sampler2D uTexture;
 uniform float uTime;
 uniform vec2 uResolution;
+uniform vec3 uColor1;
+uniform vec3 uColor2;
+uniform vec3 uColor3;
 
 void main(void) {
     vec2 uv = vTextureCoord;
@@ -11,10 +14,10 @@ void main(void) {
     // Create animated gradient
     float time = uTime * 0.5;
     
-    // Multiple gradient layers for more interesting effect
-    vec3 color1 = vec3(0.5 + 0.5 * sin(time), 0.3 + 0.3 * cos(time * 0.7), 0.8);
-    vec3 color2 = vec3(0.8, 0.4 + 0.4 * sin(time * 0.5), 0.5 + 0.5 * cos(time));
-    vec3 color3 = vec3(0.3 + 0.3 * cos(time * 0.3), 0.6, 0.7 + 0.3 * sin(time * 0.8));
+    // Use the palette colors with animation
+    vec3 color1 = uColor1 * (0.8 + 0.2 * sin(time * 0.5));
+    vec3 color2 = uColor2 * (0.8 + 0.2 * cos(time * 0.7));
+    vec3 color3 = uColor3 * (0.8 + 0.2 * sin(time * 0.3));
     
     // Animated gradient position
     float gradient1 = uv.y + 0.3 * sin(uv.x * 3.0 + time);

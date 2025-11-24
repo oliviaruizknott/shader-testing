@@ -18,6 +18,35 @@ await app.init({
 // Add canvas to the container
 container.appendChild(app.canvas);
 
+// Color palettes for different modes
+const colorPalettes = {
+  workspace: {
+    color1: [0.2, 0.4, 0.8],
+    color2: [0.4, 0.6, 0.9],
+    color3: [0.3, 0.8, 0.7],
+  },
+  chill: {
+    color1: [0.6, 0.4, 0.8],
+    color2: [0.8, 0.5, 0.7],
+    color3: [0.5, 0.6, 0.9],
+  },
+  photo: {
+    color1: [1.0, 0.6, 0.3],
+    color2: [1.0, 0.8, 0.3],
+    color3: [0.9, 0.4, 0.5],
+  },
+  date: {
+    color1: [0.9, 0.2, 0.4],
+    color2: [0.8, 0.3, 0.6],
+    color3: [0.6, 0.2, 0.5],
+  },
+  nightclub: {
+    color1: [0.8, 0.0, 0.8],
+    color2: [0.0, 0.8, 0.8],
+    color3: [0.8, 0.8, 0.0],
+  },
+};
+
 // Create filter using PIXI.Filter with GlProgram
 const gradientFilter = new PIXI.Filter({
   glProgram: new PIXI.GlProgram({
@@ -31,6 +60,9 @@ const gradientFilter = new PIXI.Filter({
         value: [window.innerWidth, window.innerHeight],
         type: "vec2<f32>",
       },
+      uColor1: { value: colorPalettes.workspace.color1, type: "vec3<f32>" },
+      uColor2: { value: colorPalettes.workspace.color2, type: "vec3<f32>" },
+      uColor3: { value: colorPalettes.workspace.color3, type: "vec3<f32>" },
     },
   },
 });
@@ -47,6 +79,26 @@ app.stage.addChild(graphics);
 app.ticker.add((ticker) => {
   gradientFilter.resources.timeUniforms.uniforms.uTime +=
     0.04 * ticker.deltaTime;
+});
+
+// Handle mode button clicks
+const modeButtons = document.querySelectorAll(".mode-btn");
+modeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    // Update active state
+    modeButtons.forEach((btn) => btn.classList.remove("active"));
+    button.classList.add("active");
+
+    // Get the mode and update colors
+    const mode = button.dataset.mode;
+    const palette = colorPalettes[mode];
+
+    if (palette) {
+      gradientFilter.resources.timeUniforms.uniforms.uColor1 = palette.color1;
+      gradientFilter.resources.timeUniforms.uniforms.uColor2 = palette.color2;
+      gradientFilter.resources.timeUniforms.uniforms.uColor3 = palette.color3;
+    }
+  });
 });
 
 // Handle window resize
