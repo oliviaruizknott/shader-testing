@@ -63,6 +63,19 @@ const gradientFilter = new PIXI.Filter({
       uColor1: { value: colorPalettes.workspace.color1, type: "vec3<f32>" },
       uColor2: { value: colorPalettes.workspace.color2, type: "vec3<f32>" },
       uColor3: { value: colorPalettes.workspace.color3, type: "vec3<f32>" },
+      uTargetColor1: {
+        value: colorPalettes.workspace.color1,
+        type: "vec3<f32>",
+      },
+      uTargetColor2: {
+        value: colorPalettes.workspace.color2,
+        type: "vec3<f32>",
+      },
+      uTargetColor3: {
+        value: colorPalettes.workspace.color3,
+        type: "vec3<f32>",
+      },
+      uColorTransition: { value: 1.0, type: "f32" },
     },
   },
 });
@@ -77,8 +90,29 @@ app.stage.addChild(graphics);
 
 // Animation loop
 app.ticker.add((ticker) => {
-  gradientFilter.resources.timeUniforms.uniforms.uTime +=
-    0.04 * ticker.deltaTime;
+  const uniforms = gradientFilter.resources.timeUniforms.uniforms;
+
+  // Update time
+  uniforms.uTime += 0.04 * ticker.deltaTime;
+
+  // Smoothly transition between colors
+  if (uniforms.uColorTransition < 1.0) {
+    uniforms.uColorTransition = Math.min(
+      1.0,
+      uniforms.uColorTransition + 0.02 * ticker.deltaTime
+    );
+
+    // Lerp current colors toward target colors
+    const t = uniforms.uColorTransition;
+    for (let i = 0; i < 3; i++) {
+      uniforms.uColor1[i] =
+        uniforms.uColor1[i] * (1 - t) + uniforms.uTargetColor1[i] * t;
+      uniforms.uColor2[i] =
+        uniforms.uColor2[i] * (1 - t) + uniforms.uTargetColor2[i] * t;
+      uniforms.uColor3[i] =
+        uniforms.uColor3[i] * (1 - t) + uniforms.uTargetColor3[i] * t;
+    }
+  }
 });
 
 // Handle mode button clicks
@@ -89,14 +123,25 @@ modeButtons.forEach((button) => {
     modeButtons.forEach((btn) => btn.classList.remove("active"));
     button.classList.add("active");
 
-    // Get the mode and update colors
+    // Get the mode and update target colors
     const mode = button.dataset.mode;
     const palette = colorPalettes[mode];
 
     if (palette) {
-      gradientFilter.resources.timeUniforms.uniforms.uColor1 = palette.color1;
-      gradientFilter.resources.timeUniforms.uniforms.uColor2 = palette.color2;
-      gradientFilter.resources.timeUniforms.uniforms.uColor3 = palette.color3;
+      const uniforms = gradientFilter.resources.timeUniforms.uniforms;
+
+      // Store current colors as starting point
+      uniforms.uColor1 = [...uniforms.uColor1];
+      uniforms.uColor2 = [...uniforms.uColor2];
+      uniforms.uColor3 = [...uniforms.uColor3];
+
+      // Set target colors
+      uniforms.uTargetColor1 = palette.color1;
+      uniforms.uTargetColor2 = palette.color2;
+      uniforms.uTargetColor3 = palette.color3;
+
+      // Reset transition
+      uniforms.uColorTransition = 0.0;
     }
   });
 });
